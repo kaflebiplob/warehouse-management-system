@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework",
     # 'rest_framework.authtoken',
     "corsheaders",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -195,7 +196,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Warehouse Management System API",
+    "DESCRIPTION": "API Swagger Documentation",
+    "VERSION": "1.0.0",
 }
 
 SIMPLE_JWT = {

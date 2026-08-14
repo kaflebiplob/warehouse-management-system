@@ -82,3 +82,4 @@ djangorestframework-simplejwt
 django-redis
 django-environ
 psycopg2-binary
+drf-spectacular
