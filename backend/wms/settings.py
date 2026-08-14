@@ -1,4 +1,4 @@
-import environ
+import environ  # type: ignore
 import os
 from datetime import timedelta
 
@@ -152,16 +152,9 @@ AUTHENTICATION_BACKENDS = (
 SITE_ID = 1
 
 AUTH_USER_MODEL = "users.stockUser"
-
-ACCOUNT_USERNAME_REQUIRED = False
-
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-
-ACCOUNT_EMAIL_REQUIRED = True
-
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*"]
 ACCOUNT_UNIQUE_EMAIL = True
-
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -219,3 +212,6 @@ SIMPLE_JWT = {
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
 }
+
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
