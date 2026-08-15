@@ -1,84 +1,141 @@
-import React from 'react';
-import Header from '../common/Header';
-import InputElement from '../common/InputElement';
-
-
+import React, { useState } from "react";
+import Header from "../common/Header";
+import PageHeader from "../common/PageHeader";
+import FormField, { inputStyle } from "../common/FormField";
+import Button from "../common/Button";
+import { colors } from "../theme";
 
 const CreateProductPage = () => {
+  const [form, setForm] = useState({
+    name: "",
+    quantity: "",
+    price: "",
+    sku: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
-    return (
-        <React.Fragment>
-            <Header/>
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-            <div className="container">
-        <div className="row justify-content-center">
-            <div className="col-12 col-lg-10 col-xl-8">
-                
-        <div className="header mt-md-5">
-            <div className="header-body">
-            <div className="row align-items-center">
-                <div className="col">
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/v1/products/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      setSuccess(true);
+      setForm({ name: "", quantity: "", price: "", sku: "" });
+    } catch (err) {
+      setError("Could not create product. Check the details and try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
+  return (
+    <>
+      <Header />
+      <PageHeader icon="fe-tag" title="Add a product" />
 
-                
-                <h1 className="header-title">
-                        <i className="fe fe-tag"></i>
-                    Add a product
-                </h1>
-
-                </div>
+      <div
+        style={{ maxWidth: 480, margin: "0 auto", padding: "0 1.5rem 3rem" }}
+      >
+        <form onSubmit={handleSubmit}>
+          {success && (
+            <div
+              style={{
+                background: "#35c4a11a",
+                border: `1px solid ${colors.teal}44`,
+                color: colors.teal,
+                borderRadius: 6,
+                padding: "0.6rem 0.75rem",
+                fontSize: "0.85rem",
+                marginBottom: "1.1rem",
+              }}
+            >
+              Product created.
             </div>
+          )}
+          {error && (
+            <div
+              style={{
+                background: "#e5484d1a",
+                border: `1px solid ${colors.danger}44`,
+                color: colors.danger,
+                borderRadius: 6,
+                padding: "0.6rem 0.75rem",
+                fontSize: "0.85rem",
+                marginBottom: "1.1rem",
+              }}
+            >
+              {error}
             </div>
-        </div>
+          )}
 
+          <FormField label="Product name" htmlFor="id_name">
+            <input
+              type="text"
+              name="name"
+              required
+              value={form.name}
+              onChange={handleChange}
+              style={inputStyle}
+              id="id_name"
+            />
+          </FormField>
 
-  <form className="organizer-form" method="post">
-    
-    
-    <div className="form-group">
-        <label for="id_name">Product Name</label>
-        <InputElement type="text" name="name" id="id_name"/>
-                <div className="invalid-feedback">
-                    
-                </div>
-    </div>
+          <FormField label="Product quantity" htmlFor="id_quantity">
+            <input
+              type="number"
+              name="quantity"
+              required
+              value={form.quantity}
+              onChange={handleChange}
+              style={inputStyle}
+              id="id_quantity"
+            />
+          </FormField>
 
-    <div className="form-group">
-        <label for="id_quantity">Product Quantity</label>
-        <InputElement type="number" name="quantity" id="id_quantity"/>
-                <div className="invalid-feedback">
-                    
-                </div>
-    </div>
+          <FormField label="Unit price" htmlFor="id_price">
+            <input
+              type="number"
+              step="0.01"
+              name="price"
+              required
+              value={form.price}
+              onChange={handleChange}
+              style={inputStyle}
+              id="id_price"
+            />
+          </FormField>
 
-    <div className="form-group">
-        <label for="id_price">Unit Price</label>
-            <input type="number" name="price" step="0.01" className="required form-control" required="" id="id_price"/>
-                <div className="invalid-feedback">
-                    
-                </div>
-    </div>
-    
-    <div className="form-group">
-        <label for="id_sku">Stock Keeping Unit</label>
-            <input type="text" name="sku" maxlength="50" className="required form-control" required="" id="id_sku"/>
-                <div className="invalid-feedback">
-                    
-                </div>
-    </div>    
+          <FormField label="Stock keeping unit" htmlFor="id_sku">
+            <input
+              type="text"
+              name="sku"
+              maxLength={50}
+              required
+              value={form.sku}
+              onChange={handleChange}
+              style={inputStyle}
+              id="id_sku"
+            />
+          </FormField>
 
-    <input type="submit" className="primaryAction btn btn-lg btn-block btn-primary mb-3" value="Create Product"/>
-    
-    
-    </form>
-
-
-            </div>
-        </div>
-    </div>
-        </React.Fragment>
-    )
-}
-
+          <Button type="submit" disabled={submitting}>
+            {submitting ? "Creating…" : "Create product"}
+          </Button>
+        </form>
+      </div>
+    </>
+  );
+};
 
 export default CreateProductPage;

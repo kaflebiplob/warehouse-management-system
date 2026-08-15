@@ -1,55 +1,88 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { colors, fontMono } from "../theme";
 
+const styles = {
+  nav: {
+    background: colors.bg,
+    borderBottom: `1px solid ${colors.border}`,
+    padding: "0.9rem 1.5rem",
+  },
+  inner: {
+    maxWidth: 960,
+    margin: "0 auto",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  brand: {
+    fontFamily: fontMono,
+    fontSize: "0.95rem",
+    fontWeight: 700,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    color: colors.textHi,
+    textDecoration: "none",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  brandDot: {
+    width: 7,
+    height: 7,
+    borderRadius: "50%",
+    background: colors.accent,
+  },
+  toggle: {
+    display: "none",
+    background: "transparent",
+    border: `1px solid ${colors.border}`,
+    borderRadius: 6,
+    color: colors.textHi,
+    padding: "0.4rem 0.6rem",
+    cursor: "pointer",
+  },
+  avatar: {
+    width: 34,
+    height: 34,
+    borderRadius: "50%",
+    border: `1px solid ${colors.border}`,
+    background: colors.surface,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: colors.accent,
+    textDecoration: "none",
+    transition: "border-color 0.15s ease",
+  },
+};
 
 const Header = () => {
-    return (
-        <nav className="navbar navbar-expand-lg navbar-light" id="topnav">
-        <div className="container">
+  const [hoverAvatar, setHoverAvatar] = useState(false);
 
-          <button className="navbar-toggler mr-auto" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-            <span className="navbar-toggler-icon"></span>
-          </button>
+  return (
+    <nav style={styles.nav} id="topnav">
+      <div style={styles.inner}>
+        <Link to="/" style={styles.brand}>
+          <span style={styles.brandDot} />
+          Stock
+        </Link>
 
-
-          <div className="navbar-user">
-      
-
-            <div className="dropdown">
-        
-              <div className="avatar-img rounded-circle">
-                <Link to="/login">
-                <i className="fe fe-user">                      </i>          
-                </Link>
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div className="collapse navbar-collapse mr-auto order-lg-first" id="navbar">
-
-
-
-
-            <ul className="navbar-nav mr-auto">
-
-              <h2 className="text-muted nav-item mb-0">
-                <div>
-                  <Link to='/'>
-                  Stock
-                  </Link>
-                </div>
-              </h2>
-            </ul>
-
-          </div>
-
-        </div>
-      </nav>
-    )
-}
-
+        <Link
+          to="/login"
+          style={{
+            ...styles.avatar,
+            borderColor: hoverAvatar ? colors.accent : colors.border,
+          }}
+          onMouseEnter={() => setHoverAvatar(true)}
+          onMouseLeave={() => setHoverAvatar(false)}
+          aria-label="Account"
+        >
+          <i className="fe fe-user" aria-hidden="true" />
+        </Link>
+      </div>
+    </nav>
+  );
+};
 
 export default Header;

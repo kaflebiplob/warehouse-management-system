@@ -1,28 +1,42 @@
-import React, {useState, useEffect} from 'react';
-import Header from '../common/Header';
-import Table from '../common/Table';
+// src/Pages/Customers.js
+import React, { useState, useEffect } from "react";
+import Header from "../common/Header";
+import Table from "../common/Table";
+import Spinner from "../common/Spinner";
+import PageHeader from "../common/PageHeader";
 
 const Customers = () => {
-  const [dataList, setdataList] = useState([]);
-  const [isLoading, setisLoading] = useState(true);
+  const [dataList, setDataList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const dataHeadings = ["Firstname", "Lastname", "Email"];
 
-  const dataHeadings = ['Firstname', 'Lastname', 'Email'];
-
-
-  useEffect( () => {
-    fetch('http://127.0.0.1:8000/api/v1/customers/all')
-    .then( res => res.json())
-    .then( data => setdataList([...data]) )
-    .then(setisLoading(false))
-    .catch(err => setisLoading(true));
-  }, [])
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/v1/customers/all")
+      .then((res) => res.json())
+      .then((data) => {
+        setDataList([...data]);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setError("Could not load customers.");
+        setIsLoading(false);
+      });
+  }, []);
 
   return (
     <>
       <Header />
-
-      { isLoading ?  <div className="spinner-border text-primary" role="status"> <span className="sr-only">Loading...</span> </div>
-                  :  <Table data={dataHeadings} editable={false} list={dataList}/>}
+      <PageHeader icon="fe-user" title="Customers" />
+      {isLoading ? (
+        <Spinner label="Loading customers…" />
+      ) : error ? (
+        <div style={{ textAlign: "center", color: "#e5484d", padding: "2rem" }}>
+          {error}
+        </div>
+      ) : (
+        <Table data={dataHeadings} list={dataList} />
+      )}
     </>
   );
 };
