@@ -116,28 +116,94 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      console.log("[LoginPage] token already exists, skipping login page");
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+  useEffect(() => {
     if (isLoggedIn) {
+      console.log("[LoginPage] isLoggedIn is true, navigating to /");
       navigate("/");
     }
   }, [isLoggedIn, navigate]);
 
   const handleSubmit = async (event) => {
+    console.log("[LoginPage] handleSubmit fired");
     event.preventDefault();
     setError("");
     setSubmitting(true);
+
     try {
+      console.log("[LoginPage] sending request to /api/token with:", {
+        email,
+        password: "(hidden)",
+      });
+
       const response = await axiosInstance.post("/api/token", {
         email,
         password,
       });
-      axiosInstance.defaults.headers["Authorization"] =
-        "JWT" + response.data.access;
-      localStorage.setItem("access_token", response.data.access);
-      localStorage.setItem("refresh_token", response.data.refresh);
+
+      console.log(
+        "[LoginPage] request succeeded, response.data:",
+        response.data,
+      );
+
+      const accessToken = response.data.access;
+      const refreshToken = response.data.refresh;
+
+      if (!accessToken || !refreshToken) {
+        console.error(
+          "[LoginPage] response was 200 but missing access/refresh fields:",
+          response.data,
+        );
+        setError(
+          "Server responded but did not return tokens. Check the response shape.",
+        );
+        setSubmitting(false);
+        return;
+      }
+
+      axiosInstance.defaults.headers["Authorization"] = `JWT ${accessToken}`;
+      localStorage.setItem("access_token", accessToken);
+      localStorage.setItem("refresh_token", refreshToken);
+
+      console.log(
+        "[LoginPage] wrote to localStorage. access_token now:",
+        localStorage.getItem("access_token"),
+      );
+
       setIsLoggedIn(true);
     } catch (err) {
+      if (err.response) {
+        // Server responded, but with an error status (400/401/500 etc)
+        console.error(
+          "[LoginPage] server responded with error:",
+          err.response.status,
+          err.response.data,
+        );
+        setError(
+          err.response.data?.detail ||
+            err.response.data?.non_field_errors?.[0] ||
+            `Server error (${err.response.status}). Check console for details.`,
+        );
+      } else if (err.request) {
+        // Request was sent but no response came back at all (server down, CORS block, wrong URL)
+        console.error(
+          "[LoginPage] no response received. Possible CORS, network, or server-down issue:",
+          err.request,
+        );
+        setError("No response from server. Is Django running? Check console.");
+      } else {
+        // Something broke before the request was even sent
+        console.error("[LoginPage] request setup error:", err.message);
+        setError(
+          "Something went wrong before the request was sent. Check console.",
+        );
+      }
       setIsLoggedIn(false);
-      setError("Incorrect email or password. Try again.");
     } finally {
       setSubmitting(false);
     }
@@ -173,7 +239,7 @@ const LoginPage = () => {
               <label style={styles.label} htmlFor="id_password">
                 Password
               </label>
-              <a href="/accounts/password/reset/" style={styles.forgot}>
+              <a href={`${process.env.REACT_APP_API_BASE_URL}/accounts/password/reset/`} style={styles.forgot}>
                 Forgot password?
               </a>
             </div>
@@ -209,7 +275,10 @@ const LoginPage = () => {
 
           <div style={styles.footer}>
             Don't have an account?{" "}
-            <a href="/accounts/signup/?next=%2F" style={styles.link}>
+            <a
+              href={`${process.env.REACT_APP_API_BASE_URL}/accounts/signup/?next=%2F`}
+              style={styles.link}
+            >
               Sign up
             </a>
           </div>

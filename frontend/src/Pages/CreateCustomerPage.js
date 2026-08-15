@@ -5,6 +5,7 @@ import FormField, { inputStyle } from "../common/FormField";
 import Button from "../common/Button";
 import { colors } from "../theme";
 import PageWrapper from "../common/PageWrapper";
+import axiosInstance from "../axiosInstance";
 
 const CreateCustomerPage = () => {
   const [form, setForm] = useState({ firstname: "", lastname: "", email: "" });
@@ -19,16 +20,14 @@ const CreateCustomerPage = () => {
     e.preventDefault();
     setSubmitting(true);
     setError("");
+    setSuccess(false);
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/v1/customers/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error("Request failed");
+      await axiosInstance.post("/api/v1/customers/create", form);
       setSuccess(true);
       setForm({ firstname: "", lastname: "", email: "" });
     } catch (err) {
+      console.error("[CreateCustomerPage] failed to create customer:", err);
       setError("Could not create customer. Check the details and try again.");
     } finally {
       setSubmitting(false);

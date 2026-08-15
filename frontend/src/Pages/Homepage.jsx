@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../fonts/feather/feather.min.css";
 import Header from "../common/Header";
 import { Link } from "react-router-dom";
+import axiosInstance from "../axiosInstance";
 
 // Design tokens
 const colors = {
@@ -19,12 +20,6 @@ const colors = {
 const fontDisplay = "'Segoe UI', system-ui, -apple-system, sans-serif";
 const fontBody = "'Segoe UI', system-ui, -apple-system, sans-serif";
 const fontMono = "'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace";
-
-const stats = [
-  { label: "Total Orders", value: "GHS 200", code: "LOG-01" },
-  { label: "Total Products", value: "100", code: "LOG-02" },
-  { label: "Customers", value: "20", code: "LOG-03" },
-];
 
 const panels = [
   {
@@ -207,11 +202,76 @@ const styles = {
 };
 
 const Homepage = () => {
+  const [counts, setCounts] = useState({
+    orders: null,
+    products: null,
+    customers: null,
+  });
+  const [loadError, setLoadError] = useState("");
+
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
   });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCounts = async () => {
+      try {
+        const [productsRes, customersRes, shipmentsRes] = await Promise.all([
+          axiosInstance.get("/api/v1/products/all"),
+          axiosInstance.get("/api/v1/customers/all"),
+          axiosInstance.get("/api/v1/shipments/all"),
+        ]);
+
+        if (!isMounted) return;
+
+        // Handles both plain arrays and DRF-paginated {count, results} responses
+        const extractCount = (data) => {
+          if (Array.isArray(data)) return data.length;
+          if (data && typeof data.count === "number") return data.count;
+          if (data && Array.isArray(data.results)) return data.results.length;
+          return 0;
+        };
+
+        setCounts({
+          products: extractCount(productsRes.data),
+          customers: extractCount(customersRes.data),
+          orders: extractCount(shipmentsRes.data),
+        });
+      } catch (err) {
+        console.error("[Homepage] failed to load stats:", err);
+        if (isMounted) {
+          setLoadError("Couldn't load live stats. Showing unavailable.");
+        }
+      }
+    };
+
+    fetchCounts();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const stats = [
+    {
+      label: "Total Shipments",
+      value: counts.orders === null ? "…" : counts.orders,
+      code: "LOG-01",
+    },
+    {
+      label: "Total Products",
+      value: counts.products === null ? "…" : counts.products,
+      code: "LOG-02",
+    },
+    {
+      label: "Customers",
+      value: counts.customers === null ? "…" : counts.customers,
+      code: "LOG-03",
+    },
+  ];
 
   return (
     <>
@@ -222,13 +282,29 @@ const Homepage = () => {
           <div style={styles.topline}>
             <div>
               <p style={styles.eyebrow}>Warehouse Name</p>
-              <h1 style={styles.greeting}>Welcome back, Desmond</h1>
+              <h1 style={styles.greeting}>Welcome back, AWS Warehouse</h1>
             </div>
             <div style={styles.manifestTag}>
               <span style={styles.dot} />
               MANIFEST · {today}
             </div>
           </div>
+
+          {loadError && (
+            <div
+              style={{
+                background: "#e5484d1a",
+                border: "1px solid #e5484d44",
+                color: "#e5484d",
+                borderRadius: 6,
+                padding: "0.6rem 0.75rem",
+                fontSize: "0.82rem",
+                marginBottom: "1.5rem",
+              }}
+            >
+              {loadError}
+            </div>
+          )}
 
           {/* Stat strip */}
           <div style={styles.stats}>

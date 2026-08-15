@@ -1,10 +1,10 @@
-// src/Pages/Customers.js
 import React, { useState, useEffect } from "react";
 import Header from "../common/Header";
 import Table from "../common/Table";
 import Spinner from "../common/Spinner";
 import PageHeader from "../common/PageHeader";
 import PageWrapper from "../common/PageWrapper";
+import axiosInstance from "../axiosInstance";
 
 const Customers = () => {
   const [dataList, setDataList] = useState([]);
@@ -13,16 +13,26 @@ const Customers = () => {
   const dataHeadings = ["Firstname", "Lastname", "Email"];
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/v1/customers/all")
-      .then((res) => res.json())
-      .then((data) => {
-        setDataList([...data]);
+    let isMounted = true;
+
+    axiosInstance
+      .get("/api/v1/customers/all")
+      .then((res) => {
+        if (!isMounted) return;
+        setDataList([...res.data]);
         setIsLoading(false);
       })
-      .catch(() => {
-        setError("Could not load customers.");
-        setIsLoading(false);
+      .catch((err) => {
+        console.error("[Customers] failed to load customers:", err);
+        if (isMounted) {
+          setError("Could not load customers.");
+          setIsLoading(false);
+        }
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
