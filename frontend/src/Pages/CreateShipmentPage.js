@@ -4,6 +4,7 @@ import PageHeader from "../common/PageHeader";
 import FormField, { inputStyle } from "../common/FormField";
 import Button from "../common/Button";
 import { colors } from "../theme";
+import PageWrapper from "../common/PageWrapper";
 
 const customers = [
   { id: 1, name: "Kwame Mensah" },
@@ -57,6 +58,7 @@ const CreateShipmentPage = () => {
   return (
     <>
       <Header />
+      <PageWrapper>
       <PageHeader icon="fe-truck" title="Create a new shipment" />
 
       <div
@@ -161,6 +163,7 @@ const CreateShipmentPage = () => {
           </Button>
         </form>
       </div>
+      </PageWrapper>
     </>
   );
 };

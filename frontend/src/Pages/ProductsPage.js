@@ -4,6 +4,7 @@ import Header from "../common/Header";
 import Table from "../common/Table";
 import Spinner from "../common/Spinner";
 import PageHeader from "../common/PageHeader";
+import PageWrapper from "../common/PageWrapper";
 
 const ProductsPage = () => {
   const [productsList, setProductsList] = useState([]);
@@ -26,17 +27,23 @@ const ProductsPage = () => {
 
   return (
     <>
-      <Header />
-      <PageHeader icon="fe-tag" title="Products" />
-      {isLoading ? (
-        <Spinner label="Loading products…" />
-      ) : error ? (
-        <div style={{ textAlign: "center", color: "#e5484d", padding: "2rem" }}>
-          {error}
-        </div>
-      ) : (
-        <Table data={dataHeadings} list={productsList} />
-      )}
+      <>
+        <Header />
+        <PageWrapper>
+          <PageHeader icon="fe-tag" title="Products" />
+          {isLoading ? (
+            <Spinner label="Loading products…" />
+          ) : error ? (
+            <div
+              style={{ textAlign: "center", color: "#e5484d", padding: "2rem" }}
+            >
+              {error}
+            </div>
+          ) : (
+            <Table data={dataHeadings} list={productsList} />
+          )}
+        </PageWrapper>
+      </>
     </>
   );
 };

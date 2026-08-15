@@ -4,6 +4,7 @@ import PageHeader from "../common/PageHeader";
 import FormField, { inputStyle } from "../common/FormField";
 import Button from "../common/Button";
 import { colors } from "../theme";
+import PageWrapper from "../common/PageWrapper";
 
 const CreateProductPage = () => {
   const [form, setForm] = useState({
@@ -42,6 +43,7 @@ const CreateProductPage = () => {
   return (
     <>
       <Header />
+      <PageWrapper>
       <PageHeader icon="fe-tag" title="Add a product" />
 
       <div
@@ -134,6 +136,7 @@ const CreateProductPage = () => {
           </Button>
         </form>
       </div>
+      </PageWrapper>
     </>
   );
 };

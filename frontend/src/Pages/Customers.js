@@ -4,6 +4,7 @@ import Header from "../common/Header";
 import Table from "../common/Table";
 import Spinner from "../common/Spinner";
 import PageHeader from "../common/PageHeader";
+import PageWrapper from "../common/PageWrapper";
 
 const Customers = () => {
   const [dataList, setDataList] = useState([]);
@@ -27,16 +28,20 @@ const Customers = () => {
   return (
     <>
       <Header />
-      <PageHeader icon="fe-user" title="Customers" />
-      {isLoading ? (
-        <Spinner label="Loading customers…" />
-      ) : error ? (
-        <div style={{ textAlign: "center", color: "#e5484d", padding: "2rem" }}>
-          {error}
-        </div>
-      ) : (
-        <Table data={dataHeadings} list={dataList} />
-      )}
+      <PageWrapper>
+        <PageHeader icon="fe-user" title="Customers" />
+        {isLoading ? (
+          <Spinner label="Loading customers…" />
+        ) : error ? (
+          <div
+            style={{ textAlign: "center", color: "#e5484d", padding: "2rem" }}
+          >
+            {error}
+          </div>
+        ) : (
+          <Table data={dataHeadings} list={dataList} />
+        )}
+      </PageWrapper>
     </>
   );
 };

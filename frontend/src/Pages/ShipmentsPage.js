@@ -4,6 +4,7 @@ import Header from "../common/Header";
 import Table from "../common/Table";
 import Spinner from "../common/Spinner";
 import PageHeader from "../common/PageHeader";
+import PageWrapper from "../common/PageWrapper";
 
 const ShipmentsPage = () => {
   const [shipmentsList, setShipmentsList] = useState([]);
@@ -27,16 +28,20 @@ const ShipmentsPage = () => {
   return (
     <>
       <Header />
-      <PageHeader icon="fe-truck" title="Shipments" />
-      {isLoading ? (
-        <Spinner label="Loading shipments…" />
-      ) : error ? (
-        <div style={{ textAlign: "center", color: "#e5484d", padding: "2rem" }}>
-          {error}
-        </div>
-      ) : (
-        <Table data={dataHeadings} list={shipmentsList} />
-      )}
+      <PageWrapper>
+        <PageHeader icon="fe-truck" title="Shipments" />
+        {isLoading ? (
+          <Spinner label="Loading shipments…" />
+        ) : error ? (
+          <div
+            style={{ textAlign: "center", color: "#e5484d", padding: "2rem" }}
+          >
+            {error}
+          </div>
+        ) : (
+          <Table data={dataHeadings} list={shipmentsList} />
+        )}
+      </PageWrapper>
     </>
   );
 };
