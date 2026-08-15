@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import {Redirect} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import axiosInstance from '../axiosInstance';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
   const [isLoggedIn, setisLoggedIn] = useState(false)
-
+  
   useEffect(() => {
-   
-  });
-
+  if (isLoggedIn) {
+    navigate('/');
+  }
+}, [isLoggedIn, navigate]);
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
@@ -36,7 +38,7 @@ const LoginPage = () => {
     }
   };
 
-  return isLoggedIn ? <Redirect to="/"/> : (
+  return isLoggedIn ? <navigate to="/"/> : (
     <div className='container'>
       <div className='row justify-content-center'>
         <div className='col-12 col-md-5 col-xl-4 my-5'>
